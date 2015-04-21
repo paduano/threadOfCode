@@ -1,0 +1,157 @@
+<html>
+<head>
+    <title>My first Three.js app</title>
+    <style>
+        body { margin: 0; }
+        canvas { width: 100%; height: 100% }
+    </style>
+</head>
+<body>
+<script src="js/lib/three.js"></script>
+<script src="js/lib/Tween.js"></script>
+<script src="js/lib/jquery-2.1.1.js"></script>
+
+<script src="js/utils.js"></script>
+<script src="js/geometry.js"></script>
+<script src="js/Scene.js"></script>
+<script src="js/TileMaterial.js"></script>
+<script src="js/HeadMaterial.js"></script>
+<script src="js/CurveMaterial.js"></script>
+<script src="js/TileGenerator.js"></script>
+<script src="js/CurveGenerator.js"></script>
+<script src="js/SharpSpline.js"></script>
+<script src="js/PathController.js"></script>
+<script src="js/Colors.js"></script>
+
+
+<script src="js/codeAnalyzer/CodeAnalyzer.js"></script>
+<script src="js/codeAnalyzer/sample.js"></script>
+
+
+
+<script src="js/main.js"></script>
+
+
+
+<script type="x-shader/x-vertex" id="tileVertexShader">
+
+			varying vec3 vColor;
+            uniform vec3 color;
+
+			attribute vec2 corner;
+			varying vec2 varyingCorner;
+
+			void main() {
+
+
+				vColor = color;
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+				varyingCorner = corner;
+
+			}
+
+</script>
+
+<script type="x-shader/x-fragment" id="tileFragmentShader">
+
+			varying vec3 vColor;
+
+
+            uniform float life;
+            uniform vec3 tangentToSpline;
+            uniform vec3 tilePosition;
+
+            varying vec2 varyingCorner;
+
+			float DistToLine(vec2 pt1, vec2 pt2, vec2 testPt)
+			{
+				  vec2 lineDir = pt2 - pt1;
+				  vec2 perpDir = vec2(lineDir.y, -lineDir.x);
+				  vec2 dirToPt1 = pt1 - testPt;
+				  return abs(dot(normalize(perpDir), dirToPt1));
+			}
+
+			void main() {
+
+				float cornerFade = DistToLine(vec2(0,0), tangentToSpline.xz, varyingCorner);
+				float angleFade = abs(dot(normalize(varyingCorner), 	tangentToSpline.xz));
+				float distanceFade = length(varyingCorner);
+				//float opacity = (1.0 - distanceFade)*(1.0 - cornerFade);
+
+				float opacity = (1.0 - distanceFade);
+
+
+				//float distanceFromSpline = DistToLine(vec2(tilePosition),vec2(tilePosition + tangentToSpline), position);
+
+				gl_FragColor = vec4( vColor.r,vColor.g,vColor.b, life * opacity * 0.5);
+
+			}
+
+</script>
+
+
+
+
+<script type="x-shader/x-vertex" id="curveVertexShader">
+
+			varying vec3 vColor;
+            uniform vec3 color;
+
+			attribute vec2 corner;
+			varying vec2 varyingCorner;
+
+			void main() {
+
+
+				vColor = color;
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+				varyingCorner = corner;
+
+			}
+
+</script>
+
+<script type="x-shader/x-fragment" id="curveFragmentShader">
+
+			varying vec3 vColor;
+
+
+            uniform float life;
+            uniform vec3 tangentToSpline;
+            uniform vec3 tilePosition;
+
+            varying vec2 varyingCorner;
+
+			float DistToLine(vec2 pt1, vec2 pt2, vec2 testPt)
+			{
+				  vec2 lineDir = pt2 - pt1;
+				  vec2 perpDir = vec2(lineDir.y, -lineDir.x);
+				  vec2 dirToPt1 = pt1 - testPt;
+				  return abs(dot(normalize(perpDir), dirToPt1));
+			}
+
+			void main() {
+
+				//float cornerFade = DistToLine(vec2(0,0), tangentToSpline.xz, varyingCorner);
+				//float angleFade = abs(dot(normalize(varyingCorner), 	tangentToSpline.xz));
+				float distanceFade = length(varyingCorner);
+				//float opacity = (1.0 - distanceFade)*(1.0 - cornerFade);
+
+				float opacity = (1.0 - distanceFade);
+
+
+				//float distanceFromSpline = DistToLine(vec2(tilePosition),vec2(tilePosition + tangentToSpline), position);
+
+				gl_FragColor = vec4( vColor.r,vColor.g,vColor.b, life * opacity * 0.3);
+
+			}
+
+</script>
+
+
+</body>
+</html>
